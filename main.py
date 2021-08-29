@@ -65,15 +65,15 @@ def create_item(item: Item):
 
 @app.put("/items/{item_id}", response_model=ResponseSingleItem)
 def update_item(item_id: str, req_item: Item):
-    item = None
+    target_item = None
     for item in ITEMS:
         if item["id"] == item_id:
-            return item
-    if not item:
+            target_item = item
+    if not target_item:
         raise HTTPException(status_code=404, detail="Not Found")
 
-    item["name"] = req_item.item.name
-    return {"item": item}
+    target_item["name"] = req_item.item.name
+    return {"item": target_item}
 
 
 @app.delete("/items/{item_id}", status_code=204)
