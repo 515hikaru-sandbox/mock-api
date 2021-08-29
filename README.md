@@ -1,2 +1,7 @@
 # mock-api
-API の mock
+
+```
+poetry run uvicorn main:app --reload
+```
+
+- http://localhost:8000/docs
