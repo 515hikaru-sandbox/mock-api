@@ -1,0 +1,124 @@
+# Every test file has one or more tests...
+test_name: Get some fake data from the JSON placeholder API
+
+stages:
+  - name: Make sure Hello World
+
+    # Define the request to be made...
+    request:
+      url: http://localhost:8000
+      method: GET
+
+    # ...and the expected response code and body
+    response:
+      status_code: 200
+      # A JSON dict response
+      json:
+        Hello: World
+  - name: Make sure list
+    # Define the request to be made...
+    request:
+      url: http://localhost:8000/items
+      method: GET
+
+    # ...and the expected response code and body
+    response:
+      status_code: 200
+      # A JSON dict response
+      save:
+        json:
+          first_val: items[0]
+  - name: Make sure 2
+
+    # Define the request to be made...
+    request:
+      url: http://localhost:8000/items/{first_val.id}
+      method: GET
+
+    # ...and the expected response code and body
+    response:
+      headers:
+        content-type: application/json
+      status_code: 200
+      # A JSON dict response
+      json:
+        item:
+          id: !anystr
+          name: item 1
+
+---
+
+# POST -> GET -> UPDATE -> DELETE -> GET
+test_name: CRUD item
+
+stages:
+  - name: Create Item
+
+    # Define the request to be made...
+    request:
+      url: http://localhost:8000/items
+      method: POST
+      json:
+        item:
+          name: item x
+
+    # ...and the expected response code and body
+    response:
+      status_code: 201
+      # A JSON dict response
+      save:
+        json:
+          item_id: item.id
+  - name: Get target item
+    request:
+      url: http://localhost:8000/items/{item_id}
+      method: GET
+    response:
+      headers:
+        content-type: application/json
+      status_code: 200
+      json:
+        item:
+          id: !anystr
+          name: item x
+  - name: Update target item
+    request:
+      url: http://localhost:8000/items/{item_id}
+      method: PUT
+      json:
+        item:
+          name: item z
+    response:
+      headers:
+        content-type: application/json
+      status_code: 200
+      json:
+        item:
+          id: !anystr
+          name: item z
+  - name: Get target item updated
+    request:
+      url: http://localhost:8000/items/{item_id}
+      method: GET
+    response:
+      headers:
+        content-type: application/json
+      status_code: 200
+      json:
+        item:
+          id: !anystr
+          name: item z
+  - name: Delete target item
+    request:
+      url: http://localhost:8000/items/{item_id}
+      method: DELETE
+    response:
+      status_code: 204
+  - name: Get target item updated
+    request:
+      url: http://localhost:8000/items/{item_id}
+      method: GET
+    response:
+      headers:
+        content-type: application/json
+      status_code: 404
